@@ -1,0 +1,16 @@
+
+# Curve 0 of 1, 11 points
+# Curve title: ""< awk -F, 'NR>1 && $1==\"array_merge\" {print $2,$6}' benchmark.csv"     using 1:2"
+# x y type
+ 20  0.00819333  i
+ 40  0.0386643  i
+ 80  0.163774  i
+ 120  0.412285  i
+ 160  0.838806  i
+ 200  1.46419  i
+ 500  14.5668  i
+ 600  23.7004  i
+ 800  51.6038  i
+ 1000  100.525  i
+
+

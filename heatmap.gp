@@ -41,7 +41,6 @@ set view map
 unset key
 
 plot \
-    "temperature.csv" \
-    every ::1 \
+    "< awk -F, 'NF==3 && $1+0==$1 && $2+0==$2 && $3+0==$3 {print}' temperature.csv" \
     using 1:2:3 \
     with image

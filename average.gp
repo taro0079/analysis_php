@@ -177,15 +177,22 @@ unset table
 #
 #     t(N) = a * N^p
 #
-# p がスケーリング指数。
+# 【重要】
+# gnuplot の fit は既定で線形空間の残差
 #
-# 通常の2D計算:
-#     p ~ 2
+#     sum ( y - f(x) )^2
 #
-# array_merge をループ内で繰り返す場合:
-#     p > 2
+# を最小化する。
+# y が 0.01 秒 〜 159 秒 と4桁以上にわたる本データでは
+# 大きい N の点だけで重みが決まってしまい、
+# log-log プロット上では「合っていない」線になる。
 #
-# となることが期待される。
+# そこで両対数をとった線形回帰
+#
+#     log(t) = log(a) + p * log(N)
+#
+# を行い、相対誤差を最小化する。
+# これが log-log プロット上で見た目と一致するフィットになる。
 # ============================================================
 
 
@@ -193,64 +200,94 @@ unset table
 # for
 # ------------------------------------------------------------
 
-f_for(x) = a_for * x**p_for
+g_for(lx) = la_for + p_for * lx
 
-a_for = 1.0e-5
-p_for = 2.0
+la_for = log(1.0e-5)
+p_for  = 2.0
 
 fit \
-    f_for(x) \
+    g_for(x) \
     "for_mean.dat" \
-    using 1:2 \
-    via a_for,p_for
+    using (log($1)):(log($2)) \
+    via la_for,p_for
+
+a_for = exp(la_for)
+
+f_for(x) = a_for * x**p_for
 
 
 # ------------------------------------------------------------
 # foreach
 # ------------------------------------------------------------
 
-f_foreach(x) = a_foreach * x**p_foreach
+g_foreach(lx) = la_foreach + p_foreach * lx
 
-a_foreach = 1.0e-5
-p_foreach = 2.0
+la_foreach = log(1.0e-5)
+p_foreach  = 2.0
 
 fit \
-    f_foreach(x) \
+    g_foreach(x) \
     "foreach_mean.dat" \
-    using 1:2 \
-    via a_foreach,p_foreach
+    using (log($1)):(log($2)) \
+    via la_foreach,p_foreach
+
+a_foreach = exp(la_foreach)
+
+f_foreach(x) = a_foreach * x**p_foreach
 
 
 # ------------------------------------------------------------
 # array_map
 # ------------------------------------------------------------
 
-f_map(x) = a_map * x**p_map
+g_map(lx) = la_map + p_map * lx
 
-a_map = 1.0e-5
-p_map = 2.0
+la_map = log(1.0e-5)
+p_map  = 2.0
 
 fit \
-    f_map(x) \
+    g_map(x) \
     "array_map_mean.dat" \
-    using 1:2 \
-    via a_map,p_map
+    using (log($1)):(log($2)) \
+    via la_map,p_map
+
+a_map = exp(la_map)
+
+f_map(x) = a_map * x**p_map
 
 
 # ------------------------------------------------------------
 # array_merge
+#
+# array_merge は単一のべき乗則ではない。
+# 局所指数は
+#
+#     N=20-40   : p ~ 1.97
+#     N=80-120  : p ~ 2.41
+#     N=200-500 : p ~ 2.53
+#
+# と N とともに増大する。
+# さらに N=600, 800 は測定ノイズが大きい。
+#
+# したがって以下の p は
+# 「測定範囲全体をならした実効スケーリング指数」
+# であって、漸近的な理論指数ではない。
 # ------------------------------------------------------------
 
-f_merge(x) = a_merge * x**p_merge
+g_merge(lx) = la_merge + p_merge * lx
 
-a_merge = 1.0e-5
-p_merge = 3.0
+la_merge = log(1.0e-5)
+p_merge  = 2.5
 
 fit \
-    f_merge(x) \
+    g_merge(x) \
     "array_merge_mean.dat" \
-    using 1:2 \
-    via a_merge,p_merge
+    using (log($1)):(log($2)) \
+    via la_merge,p_merge
+
+a_merge = exp(la_merge)
+
+f_merge(x) = a_merge * x**p_merge
 
 
 # ============================================================
