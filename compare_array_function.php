@@ -1,18 +1,142 @@
 <?php
 
 /**
- * PHP 7.4
  * 2D Heat Conduction Benchmark
+ *
+ * PHP 7.4 と 8.5 を同一条件で比較するためのベンチマーク。
+ * 構文は PHP 7.4 互換に保つこと。
  *
  * Explicit finite difference method.
  *
  * 実行:
- *   php heat2d_benchmark.php
+ *   php compare_array_function.php
+ *   ./run_benchmark.sh            (7.4 / 8.5 を Docker で連続実行)
+ *
+ * 環境変数:
+ *   BENCH_OUT       出力CSVパス          (既定: benchmark_<series>.csv)
+ *   BENCH_GRIDS     格子サイズのカンマ区切り (既定: 20,40,80,120,160,200,500,600,800,1000)
+ *   BENCH_STEPS     時間ステップ数        (既定: 100)
+ *   BENCH_REPEAT    繰り返し回数          (既定: 3)
+ *   BENCH_METHODS   計測対象のカンマ区切り (既定: for,foreach,array_map,array_merge)
+ *   BENCH_HEATMAP   1 なら temperature.csv も出力 (既定: 0)
+ *   BENCH_SERIES    CSV/凡例に使う系列名   (既定: 7.4 / 8.5 などのMAJOR.MINOR)
+ *   BENCH_LABEL     CSV に記録する実行ラベル (既定: PHP_VERSION)
  *
  * 出力:
- *   benchmark.csv
+ *   benchmark_<series>.csv
+ *   temperature.csv  (BENCH_HEATMAP=1 のときのみ)
  */
 
+/*
+ * --------------------------------------------------
+ * 環境変数ヘルパ
+ * --------------------------------------------------
+ */
+function envString(string $name, string $default): string
+{
+    $value = getenv($name);
+
+    if ($value === false || $value === '') {
+        return $default;
+    }
+
+    return $value;
+}
+
+function envInt(string $name, int $default): int
+{
+    $value = getenv($name);
+
+    if ($value === false || $value === '') {
+        return $default;
+    }
+
+    return (int)$value;
+}
+
+function envIntList(string $name, array $default): array
+{
+    $value = getenv($name);
+
+    if ($value === false || $value === '') {
+        return $default;
+    }
+
+    $list = [];
+
+    foreach (explode(',', $value) as $item) {
+
+        $item = trim($item);
+
+        if ($item === '') {
+            continue;
+        }
+
+        $list[] = (int)$item;
+    }
+
+    return $list === [] ? $default : $list;
+}
+
+function envStringList(string $name, array $default): array
+{
+    $value = getenv($name);
+
+    if ($value === false || $value === '') {
+        return $default;
+    }
+
+    $list = [];
+
+    foreach (explode(',', $value) as $item) {
+
+        $item = trim($item);
+
+        if ($item === '') {
+            continue;
+        }
+
+        $list[] = $item;
+    }
+
+    return $list === [] ? $default : $list;
+}
+
+/*
+ * fputcsv のラッパ。
+ *
+ * PHP 8.4 以降は $escape 既定値の使用が deprecated になり
+ * 実行時に Deprecated 通知が出る。
+ * 空文字は PHP 7.4 以降で受け付けられるため、
+ * 明示的に "" を渡して 7.4 / 8.5 双方で無警告にする。
+ */
+function csvRow($handle, array $row): void
+{
+    fputcsv($handle, $row, ',', '"', '');
+}
+
+
+/*
+ * --------------------------------------------------
+ * 実行中の PHP を識別する値
+ * --------------------------------------------------
+ *
+ * series は "7.4" / "8.5" のようなマイナーまでの系列。
+ * gnuplot 側のフィルタキーとして使う。
+ */
+$phpSeries = envString(
+    'BENCH_SERIES',
+    PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION
+);
+
+$phpVersion = envString('BENCH_LABEL', PHP_VERSION);
+
+
+/*
+ * --------------------------------------------------
+ * 物理パラメータ
+ * --------------------------------------------------
+ */
 $alpha = 1.0;
 $dx = 1.0;
 $dy = 1.0;
@@ -34,23 +158,27 @@ if (($rx + $ry) > 0.5) {
  * NxN 格子
  *
  * array_merge は非常に遅くなるので、
- * 最初はこの程度がおすすめ。
+ * 短時間で回したいときは BENCH_GRIDS で絞る。
  */
-$gridSizes = [
-    20,
-    40,
-    80,
-    120,
-    160,
-    200,
-    500,
-    600,
-    800,
-    1000
-];
+$gridSizes = envIntList(
+    'BENCH_GRIDS',
+    [
+        20,
+        40,
+        80,
+        120,
+        160,
+        200,
+        500,
+        600,
+        800,
+        1000
+    ]
+);
 
-$steps = 100;
-$repeat = 3;
+$steps = envInt('BENCH_STEPS', 100);
+
+$repeat = envInt('BENCH_REPEAT', 3);
 
 
 /*
@@ -393,7 +521,7 @@ function benchmark(
  * 測定対象
  * --------------------------------------------------
  */
-$methods = [
+$allMethods = [
 
     'for' => 'simulationFor',
 
@@ -404,26 +532,53 @@ $methods = [
     'array_merge' => 'simulationArrayMerge',
 ];
 
+$selected = envStringList(
+    'BENCH_METHODS',
+    array_keys($allMethods)
+);
+
+$methods = [];
+
+foreach ($selected as $name) {
+
+    if (!isset($allMethods[$name])) {
+        die("ERROR: unknown method '{$name}'\n");
+    }
+
+    $methods[$name] = $allMethods[$name];
+}
+
 
 /*
  * --------------------------------------------------
  * CSV
  * --------------------------------------------------
+ *
+ * 既定の出力先はバージョン系列ごとに分ける。
+ * こうしないと 7.4 の結果を 8.5 が上書きしてしまう。
  */
-$csv = fopen(
-    __DIR__ . '/benchmark.csv',
-    'w'
+$csvPath = envString(
+    'BENCH_OUT',
+    __DIR__ . '/benchmark_' . $phpSeries . '.csv'
 );
 
+$csv = fopen($csvPath, 'w');
+
 if ($csv === false) {
-    die("Cannot open benchmark.csv\n");
+    die("Cannot open {$csvPath}\n");
 }
 
 
 /*
  * CSV Header
+ *
+ * 【重要】
+ * gnuplot 側は列番号で参照している。
+ * 列の追加・並べ替えをしたら
+ * average.gp / compare_versions.gp / plot_time.gp を
+ * 必ず同時に更新すること。
  */
-fputcsv(
+csvRow(
     $csv,
     [
         'method',
@@ -436,6 +591,8 @@ fputcsv(
         'time_per_cell_ns',
         'peak_memory_mb',
         'center_temperature',
+        'php_series',
+        'php_version',
     ]
 );
 
@@ -446,12 +603,24 @@ fputcsv(
  * --------------------------------------------------
  */
 
-echo "PHP Version: " . PHP_VERSION . PHP_EOL;
+echo "PHP Version: " . PHP_VERSION . " (series {$phpSeries})" . PHP_EOL;
+
+echo "Label: " . $phpVersion . PHP_EOL;
 
 echo sprintf(
     "rx = %.4f, ry = %.4f\n",
     $rx,
     $ry
+);
+
+echo sprintf(
+    "grids = %s\n",
+    implode(',', $gridSizes)
+);
+
+echo sprintf(
+    "methods = %s\n",
+    implode(',', array_keys($methods))
 );
 
 echo sprintf(
@@ -520,7 +689,7 @@ foreach ($gridSizes as $n) {
                 $result['center']
             );
 
-            fputcsv(
+            csvRow(
                 $csv,
                 [
                     $methodName,
@@ -533,6 +702,8 @@ foreach ($gridSizes as $n) {
                     $timePerCellNs,
                     $peakMemoryMb,
                     $result['center'],
+                    $phpSeries,
+                    $phpVersion,
                 ]
             );
         }
@@ -544,19 +715,31 @@ foreach ($gridSizes as $n) {
 fclose($csv);
 
 echo PHP_EOL;
-echo "benchmark.csv written." . PHP_EOL;
+echo basename($csvPath) . " written." . PHP_EOL;
 
 
 /*
  * ============================================================
  * Heat conduction result
  *
- * 最終温度場を gnuplot 用 CSV に出力
+ * 最終温度場を gnuplot 用 CSV に出力。
+ *
+ * これは物理計算であってベンチマークではなく、
+ * どのバージョンで計算しても同じ結果になる。
+ * 7.4 / 8.5 を続けて回すときに二重計算しないよう、
+ * 既定では無効。BENCH_HEATMAP=1 で有効化する。
  * ============================================================
  */
 
-$heatGridSize = 200;
-$heatSteps = 1000;
+if (envInt('BENCH_HEATMAP', 0) !== 1) {
+
+    echo "Skipping temperature field (set BENCH_HEATMAP=1 to enable)." . PHP_EOL;
+
+    exit(0);
+}
+
+$heatGridSize = envInt('BENCH_HEATMAP_N', 200);
+$heatSteps = envInt('BENCH_HEATMAP_STEPS', 1000);
 
 echo PHP_EOL;
 echo "Calculating temperature field..." . PHP_EOL;
@@ -590,7 +773,7 @@ if ($temperatureCsv === false) {
     die("Cannot open temperature.csv\n");
 }
 
-fputcsv(
+csvRow(
     $temperatureCsv,
     [
         'x',
@@ -603,7 +786,7 @@ for ($y = 0; $y < $heatGridSize; $y++) {
 
     for ($x = 0; $x < $heatGridSize; $x++) {
 
-        fputcsv(
+        csvRow(
             $temperatureCsv,
             [
                 $x,

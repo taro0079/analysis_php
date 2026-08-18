@@ -142,3 +142,723 @@ correlation matrix of the fit parameters:
                 la_mer p_merg 
 la_merge        1.000 
 p_merge        -0.973  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:08:38 2026
+
+
+FIT:    data read from meanfile("for")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_for(x)
+	g_for(lx) = la_for + p_for * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_for        p_for        
+   0 2.8231991373e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 7.1146318863e-03  -2.92e-02  1.03e-03   -1.393912e+01   2.058979e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.00711463
+rel. change during last iteration : -2.92266e-07
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0421741
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00177866
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_for          = -13.9391         +/- 0.09509      (0.6822%)
+p_for           = 2.05898          +/- 0.02139      (1.039%)
+
+correlation matrix of the fit parameters:
+                la_for p_for  
+la_for          1.000 
+p_for          -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:08:38 2026
+
+
+FIT:    data read from meanfile("foreach")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_foreach(x)
+	g_foreach(lx) = la_foreach + p_foreach * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_foreach    p_foreach    
+   0 2.6031773332e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 3.2263271594e-03  -5.50e-02  1.03e-03   -1.380435e+01   2.047806e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.00322633
+rel. change during last iteration : -5.50064e-07
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0284004
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000806582
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_foreach      = -13.8044         +/- 0.06404      (0.4639%)
+p_foreach       = 2.04781          +/- 0.01441      (0.7035%)
+
+correlation matrix of the fit parameters:
+                la_for p_fore 
+la_foreach      1.000 
+p_foreach      -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:08:38 2026
+
+
+FIT:    data read from meanfile("array_map")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_map(x)
+	g_map(lx) = la_map + p_map * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_map        p_map        
+   0 1.7126598956e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 1.5678450381e-03  -3.57e-02  1.03e-03   -1.312814e+01   1.983035e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.00156785
+rel. change during last iteration : -3.57156e-07
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.019798
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000391961
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_map          = -13.1281         +/- 0.04464      (0.34%)
+p_map           = 1.98303          +/- 0.01004      (0.5065%)
+
+correlation matrix of the fit parameters:
+                la_map p_map  
+la_map          1.000 
+p_map          -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:08:38 2026
+
+
+FIT:    data read from meanfile("array_merge")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_merge(x)
+	g_merge(lx) = la_merge + p_merge * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_merge      p_merge      
+   0 6.1003154932e+01   0.00e+00  1.13e+01   -1.151293e+01   2.500000e+00
+   4 2.6291142971e-02  -1.36e-03  1.13e-03   -1.367349e+01   2.266248e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.0262911
+rel. change during last iteration : -1.35523e-08
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0810727
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00657279
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_merge        = -13.6735         +/- 0.1828       (1.337%)
+p_merge         = 2.26625          +/- 0.04113      (1.815%)
+
+correlation matrix of the fit parameters:
+                la_mer p_merg 
+la_merge        1.000 
+p_merge        -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:08:38 2026
+
+
+FIT:    data read from meanfile("for")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_for(x)
+	g_for(lx) = la_for + p_for * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_for        p_for        
+   0 2.7995642057e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 9.5787127233e-03  -1.32e-02  1.03e-03   -1.370071e+01   2.006425e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.00957871
+rel. change during last iteration : -1.31957e-07
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0489354
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00239468
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_for          = -13.7007         +/- 0.1103       (0.8053%)
+p_for           = 2.00642          +/- 0.02482      (1.237%)
+
+correlation matrix of the fit parameters:
+                la_for p_for  
+la_for          1.000 
+p_for          -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:08:38 2026
+
+
+FIT:    data read from meanfile("foreach")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_foreach(x)
+	g_foreach(lx) = la_foreach + p_foreach * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_foreach    p_foreach    
+   0 2.6409273890e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 3.3605747599e-03  -3.69e-02  1.03e-03   -1.365365e+01   2.009810e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.00336057
+rel. change during last iteration : -3.68849e-07
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0289852
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000840144
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_foreach      = -13.6536         +/- 0.06535      (0.4787%)
+p_foreach       = 2.00981          +/- 0.0147       (0.7316%)
+
+correlation matrix of the fit parameters:
+                la_for p_fore 
+la_foreach      1.000 
+p_foreach      -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:08:38 2026
+
+
+FIT:    data read from meanfile("array_map")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_map(x)
+	g_map(lx) = la_map + p_map * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_map        p_map        
+   0 1.7258492156e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 6.9877658797e-04  -6.45e-02  1.03e-03   -1.307583e+01   1.969601e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.000698777
+rel. change during last iteration : -6.45161e-07
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0132172
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000174694
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_map          = -13.0758         +/- 0.0298       (0.2279%)
+p_map           = 1.9696           +/- 0.006705     (0.3404%)
+
+correlation matrix of the fit parameters:
+                la_map p_map  
+la_map          1.000 
+p_map          -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:08:38 2026
+
+
+FIT:    data read from meanfile("array_merge")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_merge(x)
+	g_merge(lx) = la_merge + p_merge * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_merge      p_merge      
+   0 6.3186637946e+01   0.00e+00  1.13e+01   -1.151293e+01   2.500000e+00
+   4 1.2733901063e-02  -7.24e-04  1.13e-03   -1.345619e+01   2.204243e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.0127339
+rel. change during last iteration : -7.23733e-09
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0564223
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00318348
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_merge        = -13.4562         +/- 0.1272       (0.9454%)
+p_merge         = 2.20424          +/- 0.02862      (1.298%)
+
+correlation matrix of the fit parameters:
+                la_mer p_merg 
+la_merge        1.000 
+p_merge        -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:09:43 2026
+
+
+FIT:    data read from meanfile("for")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_for(x)
+	g_for(lx) = la_for + p_for * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_for        p_for        
+   0 2.7995642057e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 9.5787127233e-03  -1.32e-02  1.03e-03   -1.370071e+01   2.006425e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.00957871
+rel. change during last iteration : -1.31957e-07
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0489354
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00239468
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_for          = -13.7007         +/- 0.1103       (0.8053%)
+p_for           = 2.00642          +/- 0.02482      (1.237%)
+
+correlation matrix of the fit parameters:
+                la_for p_for  
+la_for          1.000 
+p_for          -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:09:43 2026
+
+
+FIT:    data read from meanfile("foreach")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_foreach(x)
+	g_foreach(lx) = la_foreach + p_foreach * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_foreach    p_foreach    
+   0 2.6409273890e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 3.3605747599e-03  -3.69e-02  1.03e-03   -1.365365e+01   2.009810e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.00336057
+rel. change during last iteration : -3.68849e-07
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0289852
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000840144
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_foreach      = -13.6536         +/- 0.06535      (0.4787%)
+p_foreach       = 2.00981          +/- 0.0147       (0.7316%)
+
+correlation matrix of the fit parameters:
+                la_for p_fore 
+la_foreach      1.000 
+p_foreach      -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:09:43 2026
+
+
+FIT:    data read from meanfile("array_map")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_map(x)
+	g_map(lx) = la_map + p_map * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_map        p_map        
+   0 1.7258492156e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 6.9877658797e-04  -6.45e-02  1.03e-03   -1.307583e+01   1.969601e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.000698777
+rel. change during last iteration : -6.45161e-07
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0132172
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000174694
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_map          = -13.0758         +/- 0.0298       (0.2279%)
+p_map           = 1.9696           +/- 0.006705     (0.3404%)
+
+correlation matrix of the fit parameters:
+                la_map p_map  
+la_map          1.000 
+p_map          -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:09:43 2026
+
+
+FIT:    data read from meanfile("array_merge")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_merge(x)
+	g_merge(lx) = la_merge + p_merge * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_merge      p_merge      
+   0 6.3186637946e+01   0.00e+00  1.13e+01   -1.151293e+01   2.500000e+00
+   4 1.2733901063e-02  -7.24e-04  1.13e-03   -1.345619e+01   2.204243e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.0127339
+rel. change during last iteration : -7.23733e-09
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0564223
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00318348
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_merge        = -13.4562         +/- 0.1272       (0.9454%)
+p_merge         = 2.20424          +/- 0.02862      (1.298%)
+
+correlation matrix of the fit parameters:
+                la_mer p_merg 
+la_merge        1.000 
+p_merge        -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:10:58 2026
+
+
+FIT:    data read from meanfile("for")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_for(x)
+	g_for(lx) = la_for + p_for * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_for        p_for        
+   0 2.8294296167e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 9.6865209199e-03  -1.79e-02  1.03e-03   -1.384784e+01   2.037500e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.00968652
+rel. change during last iteration : -1.78583e-07
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0492101
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00242163
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_for          = -13.8478         +/- 0.111        (0.8012%)
+p_for           = 2.0375           +/- 0.02496      (1.225%)
+
+correlation matrix of the fit parameters:
+                la_for p_for  
+la_for          1.000 
+p_for          -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:10:58 2026
+
+
+FIT:    data read from meanfile("foreach")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_foreach(x)
+	g_foreach(lx) = la_foreach + p_foreach * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_foreach    p_foreach    
+   0 2.5583716368e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 9.1086792697e-03  -1.28e-02  1.03e-03   -1.360929e+01   2.007276e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.00910868
+rel. change during last iteration : -1.28411e-07
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0477197
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00227717
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_foreach      = -13.6093         +/- 0.1076       (0.7906%)
+p_foreach       = 2.00728          +/- 0.02421      (1.206%)
+
+correlation matrix of the fit parameters:
+                la_for p_fore 
+la_foreach      1.000 
+p_foreach      -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:10:58 2026
+
+
+FIT:    data read from meanfile("array_map")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_map(x)
+	g_map(lx) = la_map + p_map * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_map        p_map        
+   0 1.6245004471e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 1.0378864016e-02  -6.50e-04  1.03e-03   -1.274073e+01   1.904984e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.0103789
+rel. change during last iteration : -6.49671e-09
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0509384
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00259472
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_map          = -12.7407         +/- 0.1149       (0.9015%)
+p_map           = 1.90498          +/- 0.02584      (1.356%)
+
+correlation matrix of the fit parameters:
+                la_map p_map  
+la_map          1.000 
+p_map          -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:10:58 2026
+
+
+FIT:    data read from meanfile("array_merge")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_merge(x)
+	g_merge(lx) = la_merge + p_merge * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_merge      p_merge      
+   0 5.9988607856e+01   0.00e+00  1.13e+01   -1.151293e+01   2.500000e+00
+   4 2.8528313483e-02  -2.30e-05  1.13e-03   -1.322519e+01   2.171067e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.0285283
+rel. change during last iteration : -2.30345e-10
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0844516
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00713208
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_merge        = -13.2252         +/- 0.1904       (1.44%)
+p_merge         = 2.17107          +/- 0.04284      (1.973%)
+
+correlation matrix of the fit parameters:
+                la_mer p_merg 
+la_merge        1.000 
+p_merge        -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:10:58 2026
+
+
+FIT:    data read from meanfile("for")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_for(x)
+	g_for(lx) = la_for + p_for * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_for        p_for        
+   0 2.7652772295e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 3.7253812913e-03  -2.40e-02  1.03e-03   -1.356171e+01   1.977625e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.00372538
+rel. change during last iteration : -2.40196e-07
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.030518
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000931345
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_for          = -13.5617         +/- 0.06881      (0.5074%)
+p_for           = 1.97762          +/- 0.01548      (0.7828%)
+
+correlation matrix of the fit parameters:
+                la_for p_for  
+la_for          1.000 
+p_for          -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:10:58 2026
+
+
+FIT:    data read from meanfile("foreach")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_foreach(x)
+	g_foreach(lx) = la_foreach + p_foreach * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_foreach    p_foreach    
+   0 2.6423754458e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 1.5401370648e-02  -7.54e-03  1.03e-03   -1.362746e+01   2.003794e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.0154014
+rel. change during last iteration : -7.53875e-08
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0620511
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00385034
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_foreach      = -13.6275         +/- 0.1399       (1.027%)
+p_foreach       = 2.00379          +/- 0.03148      (1.571%)
+
+correlation matrix of the fit parameters:
+                la_for p_fore 
+la_foreach      1.000 
+p_foreach      -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:10:58 2026
+
+
+FIT:    data read from meanfile("array_map")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_map(x)
+	g_map(lx) = la_map + p_map * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_map        p_map        
+   0 1.6492386436e+01   0.00e+00  1.03e+01   -1.151293e+01   2.000000e+00
+   4 4.2761485690e-03  -3.44e-03  1.03e-03   -1.283990e+01   1.924593e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.00427615
+rel. change during last iteration : -3.43679e-08
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0326961
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00106904
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_map          = -12.8399         +/- 0.07372      (0.5742%)
+p_map           = 1.92459          +/- 0.01659      (0.8618%)
+
+correlation matrix of the fit parameters:
+                la_map p_map  
+la_map          1.000 
+p_map          -0.983  1.000 
+
+
+*******************************************************************************
+Tue Aug 18 09:10:58 2026
+
+
+FIT:    data read from meanfile("array_merge")     using (log($1)):(log($2))
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g_merge(x)
+	g_merge(lx) = la_merge + p_merge * lx
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   la_merge      p_merge      
+   0 6.1859913624e+01   0.00e+00  1.13e+01   -1.151293e+01   2.500000e+00
+   4 1.0301457143e-02  -2.38e-04  1.13e-03   -1.331446e+01   2.180007e+00
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 0.0103015
+rel. change during last iteration : -2.3765e-09
+
+degrees of freedom    (FIT_NDF)                        : 4
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.050748
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.00257536
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+la_merge        = -13.3145         +/- 0.1144       (0.8594%)
+p_merge         = 2.18001          +/- 0.02574      (1.181%)
+
+correlation matrix of the fit parameters:
+                la_mer p_merg 
+la_merge        1.000 
+p_merge        -0.983  1.000 
