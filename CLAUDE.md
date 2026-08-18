@@ -9,6 +9,9 @@ difference) implemented four different ways in PHP, used to measure how PHP's ar
 idioms scale — and how that scaling differs between PHP versions (7.4 vs 8.5). It is a
 measurement rig, not an application: no framework, no composer.json, no test suite.
 
+Run instructions for humans live in [README.md](README.md); keep it in sync when the
+`run_benchmark.sh` options, the env vars, or the CSV columns change.
+
 ## Commands
 
 ```sh
