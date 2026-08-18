@@ -21,6 +21,14 @@ measurement rig, not an application: no framework, no composer.json, no test sui
 # 8.5 の JIT 有効版を "8.5+jit" 系列として追加計測
 ./run_benchmark.sh --jit
 
+# opcache のみの系列 "8.5+opcache" も足す。
+# JIT は opcache の上でしか動かないので、これがないと
+# opcache 単体の効果と JIT の効果を切り分けられない。
+./run_benchmark.sh --jit --opcache
+
+# トレーシング JIT と関数 JIT の両方 ("8.5+jit" と "8.5+jit-function")
+./run_benchmark.sh --jit-mode tracing,function
+
 # 任意のバージョン集合
 ./run_benchmark.sh --versions 7.4,8.3,8.5
 
@@ -30,6 +38,8 @@ measurement rig, not an application: no framework, no composer.json, no test sui
 # --- 作図 (すべて benchmark.csv を読む) ---
 gnuplot compare_versions.gp                     # バージョン比較 (既定 7.4 vs 8.5)
 gnuplot -e "old='7.4'; new='8.5+jit'" compare_versions.gp
+gnuplot -e "old='8.5'; new='8.5+jit'" compare_versions.gp          # JIT の効果 (opcache 込み)
+gnuplot -e "old='8.5+opcache'; new='8.5+jit'" compare_versions.gp  # JIT だけの効果
 gnuplot -e "series='8.5'" average.gp            # 単一系列の t(N)=a*N^p フィット
 gnuplot -e "series='8.5'" plot_time.gp          # 生の測定点の散布図
 
@@ -72,7 +82,8 @@ emit Deprecated notices on 8.5 but not 7.4. Use `csvRow()`.
 
 **Everything is driven by environment variables**, so one script serves every version and
 `run_benchmark.sh` only has to set env: `BENCH_OUT`, `BENCH_GRIDS`, `BENCH_STEPS`,
-`BENCH_REPEAT`, `BENCH_METHODS`, `BENCH_SERIES`, `BENCH_LABEL`, `BENCH_HEATMAP`. Defaults
+`BENCH_REPEAT`, `BENCH_WARMUP`, `BENCH_METHODS`, `BENCH_SERIES`, `BENCH_LABEL`,
+`BENCH_HEATMAP`, `BENCH_EXPECT`. Defaults
 live at the top of the PHP file.
 
 **The heatmap is opt-in.** `temperature.csv` is a physics result, identical on every PHP
@@ -90,9 +101,28 @@ invalidates the comparison:
 - **Same `memory_limit`** (`512M` default) — the official images ship `128M`, and GC
   pressure differences would otherwise leak into the timings.
 - **Same opcache state.** `php:7.4-cli` has no opcache built in; `php:8.5-cli` has it
-  compiled in but with `opcache.enable_cli=0`. The default run is therefore opcache-off
-  on both. JIT is opt-in via `--jit`, recorded as a *separate* series (`8.5+jit`) rather
-  than mixed into the `8.5` numbers.
+  compiled in but with `opcache.enable_cli=0`. The baseline series therefore passes
+  `-d opcache.enable_cli=0` explicitly, so a local php.ini with `opcache.enable_cli=1`
+  can't quietly give `--runner native` a different baseline than Docker. opcache and JIT
+  are opt-in via `--opcache` / `--jit` and recorded as *separate* series (`8.5+opcache`,
+  `8.5+jit`) rather than mixed into the `8.5` numbers.
+
+- **Same warm-up.** `BENCH_WARMUP` (1 by default from `run_benchmark.sh`, 0 from a bare
+  `php compare_array_function.php`) runs every method once on a 20x20 grid before the
+  sweep starts. Tracing JIT compiles its traces on the first pass through a hot loop, and
+  without the warm-up that compilation lands entirely inside the smallest grid's first
+  repeat — measured at ~10x that method's steady-state time at N=20, which is enough to
+  turn the whole `+jit` series' geometric mean into an apparent *slowdown*. The value is
+  passed to every series in a run, because warming only one side is worse than warming
+  neither.
+
+- **The accelerator state is asserted, not assumed.** Each series is run with
+  `BENCH_EXPECT=plain|opcache|jit`, and `assertAccel()` in the PHP script compares it
+  against `opcache_get_status()` and exits **1** if they disagree. This matters most for
+  JIT: `opcache.jit=tracing` with `opcache.jit_buffer_size=0` silently produces *no* JIT,
+  and a `8.5+jit` series that never JIT-compiled anything is indistinguishable from a real
+  one by looking at the numbers. Note the non-zero exit — `die("...")` exits 0 and would
+  sail straight past `set -e`, so that check must not use it.
 
 `--platform`, uid/gid mapping (Linux only, so container-written files aren't root-owned),
 and podman fallback are all there for portability across machines.
@@ -104,17 +134,22 @@ The gnuplot scripts index benchmark.csv by *column number*, not by header name:
 ```
 1 method  2 N  3 cells  4 steps  5 repeat  6 time_sec
 7 time_per_step_ms  8 time_per_cell_ns  9 peak_memory_mb  10 center_temperature
-11 php_series  12 php_version
+11 php_series  12 php_version  13 opcache  14 jit  15 warmup
 ```
 
-Column 11 (`php_series`, e.g. `7.4`, `8.5`, `8.5+jit`) is the key every plot filters on —
-`benchmark.csv` holds all versions concatenated. Adding or reordering columns in
+Column 11 (`php_series`, e.g. `7.4`, `8.5`, `8.5+opcache`, `8.5+jit`, `8.5+jit-function`) is
+the key every plot filters on — `benchmark.csv` holds all versions concatenated.
+Columns 13/14 record what `opcache_get_status()` actually reported at run time (`on`/`off`,
+and `off`/`tracing`/`function`), not what was requested on the command line — they are the
+audit trail for whether a `+jit` series really ran with JIT. Adding or reordering columns in
 `csvRow()` breaks every `.gp` file; update
 [average.gp](average.gp), [compare_versions.gp](compare_versions.gp), and
 [plot_time.gp](plot_time.gp) together with any schema change.
 
 `run_benchmark.sh` also leaves per-version `benchmark_<series>.csv` files; `benchmark.csv`
-is their concatenation with one header.
+is their concatenation with one header. CSVs produced before columns 13-15 existed have
+only 12 columns; the plots ignore the difference (they read 1-11), but rerun the sweep
+rather than splicing old and new rows together.
 
 temperature.csv is `x,y,temperature` with a blank line after each y-row so gnuplot can
 find grid row boundaries. [heatmap.gp](heatmap.gp) additionally filters through awk
@@ -153,3 +188,14 @@ how many comment lines `set table` emits, and not on bash process substitution �
   7.4, even though a scalar-loop microbenchmark in the same containers shows ~1.3x. The
   benchmark is dominated by 2D array element access and copy-on-write separation, where
   7.4 -> 8.x gains are small. Don't assume a harness bug if the speedup looks flat.
+- JIT, measured with `--runner native` on PHP 8.4.19 (`--quick`, warm-up on, so *not* the
+  Docker 7.4/8.5 rig — rerun under Docker before quoting these): opcache alone buys
+  ~1.0-1.3x. On top of opcache, **function JIT beats tracing JIT on the plain loops** —
+  `for`/`foreach` are ~1.7-1.8x with `opcache.jit=function` but only ~1.0x with
+  `tracing`, while `array_map` gains ~1.4-1.5x either way and `array_merge` gains from
+  tracing (~1.4x) but nothing from function JIT. So neither mode dominates, and reporting
+  a single "JIT speedup" number for this benchmark would hide the split. Run
+  `--jit-mode tracing,function` when the question is about JIT.
+- Nothing here is JIT-friendly in the usual sense: the hot code is hash-table lookups and
+  refcount/COW work inside the VM's array handlers, which JIT calls into rather than
+  compiles away. Expect single-digit-x at best, not the 5-20x seen on scalar benchmarks.

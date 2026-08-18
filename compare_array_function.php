@@ -11,16 +11,19 @@
  * 実行:
  *   php compare_array_function.php
  *   ./run_benchmark.sh            (7.4 / 8.5 を Docker で連続実行)
+ *   ./run_benchmark.sh --jit      (8.x の JIT 有効版も計測)
  *
  * 環境変数:
  *   BENCH_OUT       出力CSVパス          (既定: benchmark_<series>.csv)
  *   BENCH_GRIDS     格子サイズのカンマ区切り (既定: 20,40,80,120,160,200,500,600,800,1000)
  *   BENCH_STEPS     時間ステップ数        (既定: 100)
  *   BENCH_REPEAT    繰り返し回数          (既定: 3)
+ *   BENCH_WARMUP    計測前の空回し回数      (既定: 0 / JIT 比較時は 1 以上を推奨)
  *   BENCH_METHODS   計測対象のカンマ区切り (既定: for,foreach,array_map,array_merge)
  *   BENCH_HEATMAP   1 なら temperature.csv も出力 (既定: 0)
  *   BENCH_SERIES    CSV/凡例に使う系列名   (既定: 7.4 / 8.5 などのMAJOR.MINOR)
  *   BENCH_LABEL     CSV に記録する実行ラベル (既定: PHP_VERSION)
+ *   BENCH_EXPECT    plain / opcache / jit  期待する高速化状態の検証 (既定: 検証しない)
  *
  * 出力:
  *   benchmark_<series>.csv
@@ -118,6 +121,124 @@ function csvRow($handle, array $row): void
 
 /*
  * --------------------------------------------------
+ * 実行中のアクセラレータ状態を調べる
+ * --------------------------------------------------
+ *
+ * opcache は 'on' / 'off'。
+ * jit は 'off' か opcache.jit の値そのもの ('tracing' / 'function' / '1254' など)。
+ *
+ * PHP 7.4 の公式イメージには opcache が入っていないため
+ * opcache_get_status() の存在確認から始める。
+ * JIT は 8.0 以降にしかないので 'jit' キーの有無も見る。
+ *
+ * ここで測るのは ini の設定値ではなく実際に有効になったかどうか。
+ * jit_buffer_size が 0 のままだと opcache.jit=tracing を渡しても
+ * JIT は動かず、設定だけ見ていると気付けない。
+ */
+function accelStatus(): array
+{
+    $status = [
+        'opcache' => 'off',
+        'jit' => 'off',
+    ];
+
+    if (!function_exists('opcache_get_status')) {
+        return $status;
+    }
+
+    $info = @opcache_get_status(false);
+
+    if (!is_array($info)) {
+        return $status;
+    }
+
+    if (!empty($info['opcache_enabled'])) {
+        $status['opcache'] = 'on';
+    }
+
+    if (isset($info['jit']) && !empty($info['jit']['on'])) {
+
+        $mode = trim((string)ini_get('opcache.jit'));
+
+        $status['jit'] = $mode === '' ? 'on' : $mode;
+    }
+
+    return $status;
+}
+
+
+/*
+ * 期待した状態で動いているかを確認する。
+ *
+ * BENCH_EXPECT:
+ *   plain    opcache も JIT も無効であること
+ *   opcache  opcache は有効・JIT は無効であること
+ *   jit      JIT が有効であること
+ *   (未設定) 何も確認しない
+ *
+ * 系列名が "8.5+jit" なのに実際は JIT が動いていない、
+ * という取り違えは数値を見ても分からないのでここで止める。
+ */
+function assertAccel(string $expect, array $status): void
+{
+    if ($expect === '') {
+        return;
+    }
+
+    $actual = sprintf(
+        'opcache=%s jit=%s',
+        $status['opcache'],
+        $status['jit']
+    );
+
+    $message = '';
+
+    if ($expect === 'plain') {
+
+        if ($status['opcache'] !== 'off' || $status['jit'] !== 'off') {
+            $message = "opcache/JIT なしで計測するはずが有効になっています ({$actual})";
+        }
+
+    } elseif ($expect === 'opcache') {
+
+        if ($status['opcache'] !== 'on') {
+            $message = "opcache が有効になっていません ({$actual})";
+        } elseif ($status['jit'] !== 'off') {
+            $message = "opcache のみで計測するはずが JIT も有効です ({$actual})";
+        }
+
+    } elseif ($expect === 'jit') {
+
+        if ($status['jit'] === 'off') {
+            $message =
+                "JIT が有効になっていません ({$actual})\n"
+                . "       opcache.enable_cli=1 / opcache.jit / "
+                . "opcache.jit_buffer_size を確認してください。\n"
+                . "       jit_buffer_size が 0 だと opcache.jit=tracing でも JIT は動きません。\n"
+                . "       PHP 8.0 未満には JIT がありません。";
+        }
+
+    } else {
+        $message = "unknown BENCH_EXPECT '{$expect}'";
+    }
+
+    if ($message === '') {
+        return;
+    }
+
+    /*
+     * die() は終了コード 0 で抜けるため、
+     * 呼び出し側の set -e が反応せず計測が続いてしまう。
+     * ここは必ず 1 で落とす。
+     */
+    fwrite(STDERR, "ERROR: " . $message . "\n");
+
+    exit(1);
+}
+
+
+/*
+ * --------------------------------------------------
  * 実行中の PHP を識別する値
  * --------------------------------------------------
  *
@@ -130,6 +251,15 @@ $phpSeries = envString(
 );
 
 $phpVersion = envString('BENCH_LABEL', PHP_VERSION);
+
+/*
+ * opcache / JIT の実際の状態。
+ * CSV に残しておかないと、あとから
+ * その系列が本当に JIT 有効だったのか確認できない。
+ */
+$accel = accelStatus();
+
+assertAccel(envString('BENCH_EXPECT', ''), $accel);
 
 
 /*
@@ -179,6 +309,32 @@ $gridSizes = envIntList(
 $steps = envInt('BENCH_STEPS', 100);
 
 $repeat = envInt('BENCH_REPEAT', 3);
+
+/*
+ * 計測前の空回し回数。
+ *
+ * JIT を比べるときだけ効いてくる。
+ * トレーシング JIT は最初にホットループを踏んだ実行で
+ * トレースをコンパイルするので、その1回だけ極端に遅くなる。
+ * 実測では N=20 の repeat=1 が repeat=2 の約10倍かかっていた。
+ * 空回ししておかないと、この JIT のコンパイル時間が
+ * 一番小さい格子の測定値に丸ごと乗って
+ * 「JIT のほうが遅い」という誤った結論になる。
+ *
+ * 空回しは全 method について最初にまとめて行う。
+ * 掃引が格子サイズ外側・method 内側で回るため、
+ * 各 method の最初の測定より前に済ませる必要がある。
+ */
+$warmup = envInt('BENCH_WARMUP', 0);
+
+/*
+ * 空回しの格子とステップ数。
+ * トレーシング JIT の opcache.jit_hot_loop は既定 64 なので、
+ * 20x20 を数ステップ回せばホットループとして十分に踏まれる。
+ * 本測定より十分小さくしておかないと空回し自体が高くつく。
+ */
+$warmupGrid = 20;
+$warmupSteps = 5;
 
 
 /*
@@ -593,6 +749,9 @@ csvRow(
         'center_temperature',
         'php_series',
         'php_version',
+        'opcache',
+        'jit',
+        'warmup',
     ]
 );
 
@@ -606,6 +765,12 @@ csvRow(
 echo "PHP Version: " . PHP_VERSION . " (series {$phpSeries})" . PHP_EOL;
 
 echo "Label: " . $phpVersion . PHP_EOL;
+
+echo sprintf(
+    "opcache: %s, jit: %s\n",
+    $accel['opcache'],
+    $accel['jit']
+);
 
 echo sprintf(
     "rx = %.4f, ry = %.4f\n",
@@ -624,10 +789,37 @@ echo sprintf(
 );
 
 echo sprintf(
-    "steps = %d, repeat = %d\n\n",
+    "steps = %d, repeat = %d, warmup = %d\n\n",
     $steps,
-    $repeat
+    $repeat,
+    $warmup
 );
+
+if ($warmup > 0) {
+
+    echo sprintf(
+        "Warming up (%dx%d, %d steps, %d time(s) per method)...\n",
+        $warmupGrid,
+        $warmupGrid,
+        $warmupSteps,
+        $warmup
+    );
+
+    foreach ($methods as $warmupFunction) {
+
+        for ($w = 0; $w < $warmup; $w++) {
+
+            $warmupFunction(
+                createTemperature($warmupGrid),
+                $warmupSteps,
+                $rx,
+                $ry
+            );
+        }
+    }
+
+    echo PHP_EOL;
+}
 
 printf(
     "%-14s %7s %12s %12s %12s\n",
@@ -704,6 +896,9 @@ foreach ($gridSizes as $n) {
                     $result['center'],
                     $phpSeries,
                     $phpVersion,
+                    $accel['opcache'],
+                    $accel['jit'],
+                    $warmup,
                 ]
             );
         }
